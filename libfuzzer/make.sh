@@ -26,7 +26,8 @@ err()     { echo -e "\e[0;31m[!]\e[0m $*"; }
 
 CC=clang++-3.9
 #CC=clang++-4.0
-#CC=clang++-5.0
+CC=clang++-5.0
+#CC=clang++-6.0
 CXX=${CC}
 NCPUS="`grep --count processor /proc/cpuinfo`"
 MEM_LIMIT=$((1024 / ${NCPUS}))
@@ -42,6 +43,10 @@ case ${CC} in
         ;;
 
     clang-5.0|clang++-5.0)
+        XSAN="-fsanitize=address,integer,undefined -fsanitize-coverage=trace-pc,edge"
+        ;;
+
+    clang-6.0|clang++-6.0)
         XSAN="-fsanitize=fuzzer,address,integer,undefined -fsanitize-coverage=trace-pc-guard,trace-cmp,trace-gep,trace-div"
         ;;
 
