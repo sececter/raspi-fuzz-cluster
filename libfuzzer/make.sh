@@ -7,7 +7,8 @@
 #    $ ./make myfuzzer.cc <optional-linking-flags>
 #
 # For better results, compile the targeted library with ASAN, for example:
-#    $ ./configure CC="clang-4.0 -O2 -fno-omit-frame-pointer -g -fsanitize=address -fsanitize-coverage=trace-pc-guard,trace-cmp,trace-gep,trace-div"
+#    $ ./configure CC="clang-{4,5}.0 -O1 -ggdb -fno-omit-frame-pointer -fsanitize=address,integer,undefined -fsanitize-coverage=edge" # for clang-4 or 5
+#    $ ./configure CC="clang-6.0 -O1 -ggdb -fno-omit-frame-pointer -fsanitize=fuzzer-no-link,address,integer,undefined -fsanitize-coverage=edge" # for clang-6
 #
 # Refs:
 # - http://llvm.org/docs/LibFuzzer.html
@@ -36,18 +37,22 @@ case ${CC} in
     clang-3.9|clang++-3.9)
         XSAN="-fsanitize=address,integer,undefined -fsanitize-coverage=edge"
         # -fsanitize-coverage=trace-pc doesn't work for some reasons on ARM...
+        CLANG_VERSION=3.9
         ;;
 
     clang-4.0|clang++-4.0)
         XSAN="-fsanitize=address -fsanitize-coverage=trace-pc-guard,trace-cmp,trace-gep,trace-div"
+        CLANG_VERSION=4.0
         ;;
 
     clang-5.0|clang++-5.0)
         XSAN="-fsanitize=address,integer,undefined -fsanitize-coverage=trace-pc,edge"
+        CLANG_VERSION=5.0
         ;;
 
     clang-6.0|clang++-6.0)
         XSAN="-fsanitize=fuzzer,address,integer,undefined -fsanitize-coverage=trace-pc-guard,trace-cmp,trace-gep,trace-div"
+        CLANG_VERSION=6.0
         ;;
 
     *)
@@ -72,6 +77,11 @@ require_binary()
 
 build_libfuzzer()
 {
+    if [ ${CLANG_VERSION} == "6.0" ]; then
+        info "libFuzzer is builtin llvm > 6.0, simply compile with -fsanitize=fuzzer"
+        return
+    fi
+
     info "Downloading libfuzzer"
     git clone --quiet https://chromium.googlesource.com/chromium/llvm-project/llvm/lib/Fuzzer
     info "Compiling libfuzzer"
@@ -93,7 +103,13 @@ require_binary git
 
 IN="`realpath \"$1\"`"
 OUT=${IN/.cc/}
-LIBFUZZ="`realpath \"../libFuzzer-$(arch).a\"`"
+LIBFUZZ=""
+
+
+if [ ${CLANG_VERSION} != "6.0" ]; then
+    LIBFUZZ="`realpath \"../libFuzzer-$(arch).a\"`"
+fi
+
 
 if [ "$1" = "clean" ]; then
     info "Cleaning stuff"
