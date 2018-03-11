@@ -7,6 +7,7 @@
 COMP=clang++-3.9
 # COMP=clang++-4.0
 # COMP=clang++-5.0
+# COMP=clang++-6.0
 
 case ${COMP} in
     clang-3.9|clang++-3.9)
@@ -19,6 +20,10 @@ case ${COMP} in
         ;;
 
     clang-5.0|clang++-5.0)
+        XSAN="-fsanitize=fuzzer,address,integer,undefined -fsanitize-coverage=trace-pc-guard,trace-cmp,trace-gep,trace-div"
+        ;;
+
+    clang-6.0|clang++-6.0)
         XSAN="-fsanitize=fuzzer,address,integer,undefined -fsanitize-coverage=trace-pc-guard,trace-cmp,trace-gep,trace-div"
         ;;
 

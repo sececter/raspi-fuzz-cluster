@@ -7,11 +7,15 @@ url="http://releases.llvm.org/4.0.1/clang+llvm-4.0.1-armv7a-linux-gnueabihf.tar.
 clang="/usr/bin/clang-4.0"
 clangpp="/usr/bin/clang++-4.0"
 
-# llvm + clang 5.0.0
+# llvm + clang 5.0.1
 url="http://releases.llvm.org/5.0.1/clang+llvm-5.0.1-armv7a-linux-gnueabihf.tar.xz"
 clang="/usr/bin/clang-5.0"
 clangpp="/usr/bin/clang++-5.0"
 
+# llvm + clang 6.0.0 (recommended)
+url="http://releases.llvm.org/6.0.0/clang+llvm-6.0.0-armv7a-linux-gnueabihf.tar.xz"
+clang="/usr/bin/clang-6.0"
+clangpp="/usr/bin/clang++-6.0"
 
 prefix="$(basename ${url/.tar.xz/})"
 

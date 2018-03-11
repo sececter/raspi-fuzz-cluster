@@ -26,7 +26,7 @@ warn()    { echo -e "\e[0;33m[!]\e[0m $*"; }
 err()     { echo -e "\e[0;31m[!]\e[0m $*"; }
 
 CC=clang++-3.9
-#CC=clang++-4.0
+CC=clang++-4.0
 CC=clang++-5.0
 CC=clang++-6.0
 CXX=${CC}
@@ -61,7 +61,7 @@ case ${CC} in
         ;;
 esac
 
-FLAGS="-ggdb -O1 -fno-omit-frame-pointer ${XSAN}"
+CFLAGS="-ggdb -O1 -fno-omit-frame-pointer ${XSAN}"
 
 
 require_binary()
@@ -78,7 +78,7 @@ require_binary()
 build_libfuzzer()
 {
     if [ ${CLANG_VERSION} == "6.0" ]; then
-        info "libFuzzer is builtin llvm > 6.0, simply compile with -fsanitize=fuzzer"
+        info "libFuzzer is builtin llvm >= 6.0, simply compile with -fsanitize=fuzzer"
         return
     fi
 
@@ -124,8 +124,8 @@ LIBS="$@ -lstdc++"
 
 [ ! -f ${LIBFUZZ} ] && build_libfuzzer
 
-info "Building '${OUT}'"
-${CC} ${FLAGS} ${IN} ${LIBS} ${LIBFUZZ} -o ${OUT}
+info "Building '${OUT}' using $(basename $CC)"
+${CC} ${CFLAGS} ${IN} ${LIBS} ${LIBFUZZ} -o ${OUT}
 
 success "Success, now you can:"
 echo -e "- Start a simple one-core fuzzing run by running:\n    $ ${OUT}"
